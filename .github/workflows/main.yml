@@ -40,7 +40,13 @@ jobs:
       - name: Download Mesa OpenGL Fix
         run: |
           curl -L https://github.com/pal1000/mesa-dist-win/releases/download/21.3.8/mesa3d-21.3.8-release-msvc.7z -o mesa.7z
+      - name: Install Ngrok
+       run: choco install ngrok -y
 
+      - name: Start Ngrok Tunnel
+       run: |
+         ngrok authtoken YOUR_TOKEN
+              ngrok tcp 3389
       - name: Keep Cloud PC Alive
         run: |
           while ($true) { Start-Sleep -Seconds 60 }
