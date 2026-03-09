@@ -1,0 +1,31 @@
+name: GitHub Cloud PC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+
+      - name: Enable Remote Desktop
+        run: |
+          net user gamerpc Gamer@12345 /add
+          net localgroup administrators gamerpc /add
+          reg add "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+      - name: Install Ngrok
+        run: |
+          choco install ngrok -y
+
+      - name: Start Ngrok Tunnel
+        run: |
+          ngrok authtoken YOUR_NGROK_TOKEN
+          ngrok tcp 3389
+
+      - name: Keep Cloud PC Alive
+        run: |
+          while ($true) { Start-Sleep -Seconds 60 }
