@@ -1,0 +1,57 @@
+name: Minecraft Cloud PC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cloudpc:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+
+      - name: Create Admin User
+        run: |
+          net user gamerpc Gamer@12345 /add
+          net localgroup administrators gamerpc /add
+
+      - name: Enable Remote Desktop
+        run: |
+          reg add "HKLM\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      - name: Install Java
+        run: |
+          choco install openjdk17 -y
+
+      - name: Install Tools
+        run: |
+          choco install 7zip -y
+          choco install googlechrome -y
+
+      - name: Download TLauncher
+        run: |
+          Invoke-WebRequest https://tlauncher.org/jar -OutFile tlauncher.jar
+
+      - name: Download Mesa OpenGL Fix
+        run: |
+          curl -L https://github.com/pal1000/mesa-dist-win/releases/download/21.3.8/mesa3d-21.3.8-release-msvc.7z -o mesa.7z
+
+      - name: Install Ngrok
+        run: |
+          choco install ngrok -y
+
+      - name: Start Ngrok Tunnel
+        run: |
+          ngrok authtoken YOUR_NGROK_TOKEN
+          Start-Process ngrok -ArgumentList "tcp 3389"
+
+      - name: Keep Cloud PC Alive
+        run: |
+          while ($true) { Start-Sleep -Seconds 60 }
