@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Create Admin User
         run: |
-          net user gamerpc 123456 /add
+          net user gamerpc 9899873227@d /add
           net localgroup administrators gamerpc /add
 
       - name: Enable Remote Desktop
